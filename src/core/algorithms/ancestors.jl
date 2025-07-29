@@ -206,17 +206,20 @@ conditioned_sample_node!(node_message_dict, node, model_array, partition_list) =
     )
 export endpoint_conditioned_sample_state_dict
 """
-    endpoint_conditioned_sample_state_dict(tree::FelNode, model; partition_list = 1:length(tree.message), node_message_dict = Dict{FelNode,Vector{<:Partition}}())
+    endpoint_conditioned_sample_state_dict(tree::FelNode, model; partition_list = 1:length(tree.message), node_message_dict = Dict{FelNode,Vector{<:Partition}}(), run_fel_up = true, run_fel_down = true)
 
 Takes in a tree and a model (which can be a single model, an array of models, or a function that maps FelNode->Array{<:BranchModel}), and draws samples under the model
 conditions on the leaf observations. These samples are stored in the node_message_dict, which is returned. A subset of partitions can be specified by partition_list, and a
 dictionary can be passed in to avoid re-allocating memory, in case you're running this over and over.
+The felsenstein up and down passes can be turned off by setting run_fel_up and run_fel_down to false.
 """
 function endpoint_conditioned_sample_state_dict(
     tree::FelNode,
     model;
     partition_list = 1:length(tree.message),
     node_message_dict = Dict{FelNode,Vector{<:Partition}}(),
+    run_fel_up = true,
+    run_fel_down = true,
 )
     return depth_first_reconstruction(
         tree,
@@ -224,5 +227,7 @@ function endpoint_conditioned_sample_state_dict(
         model,
         partition_list = partition_list,
         node_message_dict = node_message_dict,
+        run_fel_up = run_fel_up,
+        run_fel_down = run_fel_down,
     )
 end
