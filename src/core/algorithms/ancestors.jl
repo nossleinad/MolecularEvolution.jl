@@ -30,6 +30,7 @@ function depth_first_reconstruction(
     run_fel_down = true,
     partition_list = 1:length(tree.message),
     node_message_dict = Dict{FelNode,Vector{<:Partition}}(),
+    skip_reconstruction = n::FelNode -> false,
 )
     if run_fel_up
         felsenstein!(tree, model_func, partition_list = partition_list)
@@ -41,7 +42,7 @@ function depth_first_reconstruction(
     while length(stack) > 0
         node = pop!(stack)
         models = model_func(node)
-        r(node_message_dict, node, models, partition_list)
+        skip_reconstruction(node) || r(node_message_dict, node, models, partition_list)
         for child in node.children
             push!(stack, child)
         end
@@ -142,6 +143,7 @@ function dependent_reconstruction!(
     if !haskey(node_message_dict, node)
         node_message_dict[node] = copy_message(node.message[partition_list])
     end
+    @show isleafnode(node), isroot(node)
     m = node_message_dict[node]
     for (p, part) in enumerate(partition_list)
         if isroot(node)
@@ -220,6 +222,7 @@ function endpoint_conditioned_sample_state_dict(
     node_message_dict = Dict{FelNode,Vector{<:Partition}}(),
     run_fel_up = true,
     run_fel_down = true,
+    skip_node = n::FelNode -> false
 )
     return depth_first_reconstruction(
         tree,
@@ -229,5 +232,6 @@ function endpoint_conditioned_sample_state_dict(
         node_message_dict = node_message_dict,
         run_fel_up = run_fel_up,
         run_fel_down = run_fel_down,
+        skip_node = skip_node,
     )
 end
