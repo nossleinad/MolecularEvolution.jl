@@ -30,7 +30,7 @@ function depth_first_reconstruction(
     run_fel_down = true,
     partition_list = 1:length(tree.message),
     node_message_dict = Dict{FelNode,Vector{<:Partition}}(),
-    skip_reconstruction = n::FelNode -> false,
+    skip_node = n::FelNode -> false,
 )
     if run_fel_up
         felsenstein!(tree, model_func, partition_list = partition_list)
@@ -42,7 +42,7 @@ function depth_first_reconstruction(
     while length(stack) > 0
         node = pop!(stack)
         models = model_func(node)
-        skip_reconstruction(node) || r(node_message_dict, node, models, partition_list)
+        skip_node(node) || r(node_message_dict, node, models, partition_list)
         for child in node.children
             push!(stack, child)
         end
@@ -58,6 +58,7 @@ function depth_first_reconstruction(
     run_fel_down = true,
     partition_list = 1:length(tree.message),
     node_message_dict = Dict{FelNode,Vector{<:Partition}}(),
+    skip_node = n::FelNode -> false,
 )
     depth_first_reconstruction(
         tree,
@@ -67,6 +68,7 @@ function depth_first_reconstruction(
         run_fel_down = run_fel_down,
         partition_list = partition_list,
         node_message_dict = node_message_dict,
+        skip_node = skip_node,
     )
 end
 
@@ -78,6 +80,7 @@ function depth_first_reconstruction(
     run_fel_down = true,
     partition_list = 1:length(tree.message),
     node_message_dict = Dict{FelNode,Vector{<:Partition}}(),
+    skip_node = n::FelNode -> false,
 )
     depth_first_reconstruction(
         tree,
@@ -87,6 +90,7 @@ function depth_first_reconstruction(
         run_fel_down = run_fel_down,
         partition_list = partition_list,
         node_message_dict = node_message_dict,
+        skip_node = skip_node,
     )
 end
 
