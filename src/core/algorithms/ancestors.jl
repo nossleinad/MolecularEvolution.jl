@@ -143,7 +143,6 @@ function dependent_reconstruction!(
     if !haskey(node_message_dict, node)
         node_message_dict[node] = copy_message(node.message[partition_list])
     end
-    @show isleafnode(node), isroot(node)
     m = node_message_dict[node]
     for (p, part) in enumerate(partition_list)
         if isroot(node)
